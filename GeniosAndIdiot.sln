@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeniosAndIdiotConsoleApp", "GeniosAndIdiotConsoleApp\GeniosAndIdiotConsoleApp.csproj", "{BFC07FE7-817A-4558-ACE2-EEEA964731E0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BFC07FE7-817A-4558-ACE2-EEEA964731E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFC07FE7-817A-4558-ACE2-EEEA964731E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFC07FE7-817A-4558-ACE2-EEEA964731E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFC07FE7-817A-4558-ACE2-EEEA964731E0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D9AC331F-EDC8-4F01-B1D6-166CAF0CE5E3}
+	EndGlobalSection
+EndGlobal
