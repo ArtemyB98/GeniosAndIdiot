@@ -1,4 +1,4 @@
-﻿public class Delay : IDelay
+﻿public class Delay 
 {
     public int DelayInt { get; set; }
     public int WaitInt { get; set; }
