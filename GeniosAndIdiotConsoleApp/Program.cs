@@ -1,8 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
+public class Delay
+{
+    public int DelayInt { get; set; }
+    public int WaitInt { get; set; }
+    public string Text { get; set; }
+    public int ConsolePositionX { get; set; }
+    public int ConsolePositionY { get; set; }
+    public bool IsClear { get; set; }
+    public bool Timeout = true;
+    public Delay(int delayInt, int waitInt, string text, int conoslePositionX, int consolePositionY, bool isClear)
+    {
+        DelayInt = delayInt;
+        WaitInt = waitInt;
+        Text = text;
+        ConsolePositionX = conoslePositionX;
+        ConsolePositionY = consolePositionY;
+        IsClear = isClear;
+    }
+}
 namespace GeniosAndIdiotConsoleApp
 {
     internal class Program
@@ -32,63 +51,114 @@ namespace GeniosAndIdiotConsoleApp
             return diagnoses;
         }
 
-        static void Delay (int delayInt,int waitInt, string text, int conoslePositionX, int consolePositionY, bool isClear)
+        static void DelayBase(object delayObject)
         {
-            var delay = Task.Delay(delayInt);
-            if (isClear == true)
+            Delay delayDelay = delayObject as Delay;
+            var delay = Task.Delay(delayDelay.DelayInt);
+            if (delayDelay.IsClear == true)
             {
                 Console.Clear();
             }
-            for (int i = 5; i >= 0; i--)
+            for (int i = delayDelay.DelayInt / 1000; i >= 0; i--)
             {
-                Console.SetCursorPosition(conoslePositionX, consolePositionY);
-                Console.Write(text + i +" ");
-                delay.Wait(waitInt);
+                if (delayDelay.Timeout == false)
+                {
+                    
+                    break;
+                }
+                Console.SetCursorPosition(delayDelay.ConsolePositionX, delayDelay.ConsolePositionY);
+                Console.Write(delayDelay.Text + i + " \n");
+                delay.Wait(delayDelay.WaitInt);
             }
-            Console.Clear();
+            delayDelay.Timeout = false;
+
         }
 
-        static void startInformation (string name)
+        static void StartInformation(string name)
         {
-            
+
             Console.Clear();
             Console.WriteLine($"Давайте приступим, {name}, к выполнению теста! \nВам будут заданы поочередно пять вопросов.\nНа каждый вопрос будет выделено 10 секунд. \nДля того чтобы начать нажмите любую клавишу");
             Console.ReadKey();
             Console.Clear();
-            Delay(5000, 1000, "Начинаем через: ", 0,0,true);
+            DelayBase(new Delay(5000, 1000, "Начинаем через: ", 0, 0, true));
         }
 
         static void Main(string[] args)
         {
             Console.WriteLine("Здравствуйте, господин(жа) хороший(ая), как к Вам можно обращаться по имени?");
             string Name = Console.ReadLine();
-            startInformation(Name);
+            StartInformation(Name);
 
             List<string[]> questionsAndAnswers = GetQustionsAndAswers();
             List<string> diagnoses = GetDiagnoses();
-            
-            string answer;
+
+            string answer = null;
             Random randomStart = new Random();
             int numberForRandomStartAsking;
-            
+
             int countOfQuestions = 0;
             int countRightAnswers = 0;
-            
+            bool workProgramm = true;
 
-            while (countOfQuestions < 5)
+            while (workProgramm == true)
             {
-                numberForRandomStartAsking = randomStart.Next(0, questionsAndAnswers.Count);
-                Console.WriteLine($"Вопрос №{countOfQuestions + 1}: \n{questionsAndAnswers[numberForRandomStartAsking][0]}");
-                Delay(10000, 1000, "Осталось времени на вопрос: ", 0, 3,false);
-                answer = Console.ReadLine();
-                if (answer == questionsAndAnswers[numberForRandomStartAsking][1])
+                while (countOfQuestions < 5)
                 {
-                    countRightAnswers++;
+                    numberForRandomStartAsking = randomStart.Next(0, questionsAndAnswers.Count);
+                    Console.Clear();
+                    Console.WriteLine($"Вопрос №{countOfQuestions + 1}: \n{questionsAndAnswers[numberForRandomStartAsking][0]}");
+                    Delay delayAfterQuestion = new Delay(10000, 1000, "Осталось времени: ", 0, 2, false);
+                    ParameterizedThreadStart delayBase = new ParameterizedThreadStart(DelayBase);
+                    Thread thread = new Thread(delayBase);
+                    thread.Start(delayAfterQuestion);
+
+                    answer = Console.ReadLine();
+                    while (delayAfterQuestion.Timeout == true)
+                    {
+                        Console.SetCursorPosition(0, 3);
+                        if (answer == null)
+                        {
+                            continue;
+                        }
+                        else if (answer != null)
+                        {
+                            if (answer == questionsAndAnswers[numberForRandomStartAsking][1])
+                            {
+                                countRightAnswers++;
+
+                            }
+                            delayAfterQuestion.Timeout = false;
+                            break;
+                        }
+                    }
+
+
+                    questionsAndAnswers.Remove(questionsAndAnswers[numberForRandomStartAsking]);
+                    countOfQuestions++;
+                    Console.Clear();
                 }
-                questionsAndAnswers.Remove(questionsAndAnswers[numberForRandomStartAsking]);
-                countOfQuestions++;
+                countOfQuestions = 0;
+                while (true)
+                {
+                    Console.WriteLine($"Уважаемый(ая), {Name}, Ваш диагноз: {diagnoses[countRightAnswers]}\nХотите пройти тест ещё раз?\n1.Да\n2.Нет");
+                    string repeatOrExit = Console.ReadLine();
+                    if (repeatOrExit == "1")
+                    {
+                        questionsAndAnswers = GetQustionsAndAswers();
+                        break;
+                    }
+                    else if (repeatOrExit == "2")
+                    {
+                        workProgramm = false;
+                        Console.Clear();
+                        Console.WriteLine("Заверешение программы");
+                        break;
+                        
+                    }
+                    Console.Clear();
+                }
             }
-            Console.WriteLine($"Уважаемый(ая), {Name}, Ваш диагноз: {diagnoses[countRightAnswers]}");
         }
     }
 }
